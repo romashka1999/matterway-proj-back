@@ -2,11 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as puppeteer from 'puppeteer';
 
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const puppitierExtra = require('puppeteer-extra');
-
-puppitierExtra.use(StealthPlugin());
-
 @Injectable()
 export class AppService {
   constructor(private readonly configService: ConfigService) {}
@@ -17,6 +12,7 @@ export class AppService {
     const page = await browser.newPage();
     await page.goto(url);
 
+    await page.waitForSelector('.category__copy');
     const allGenres = await page.$$eval('.category__copy', (e) =>
       e.map((a: any) => a.innerText),
     );
@@ -30,6 +26,8 @@ export class AppService {
     const url = `https://www.goodreads.com/choiceawards/best-${genre.toLowerCase()}-books-2020`;
     const page = await browser.newPage();
     await page.goto(url);
+
+    await page.waitForSelector('.winningTitle');
 
     const bookName = await page.$eval('.winningTitle', (e: any) => e.innerText);
     await browser.close();
