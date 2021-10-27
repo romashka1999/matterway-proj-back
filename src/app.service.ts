@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as puppeteer from 'puppeteer';
 
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -8,7 +9,7 @@ puppitierExtra.use(StealthPlugin());
 
 @Injectable()
 export class AppService {
-  constructor() {}
+  constructor(private readonly configService: ConfigService) {}
 
   async getAllGenres() {
     const browser = await puppeteer.launch();
@@ -53,7 +54,10 @@ export class AppService {
       await page.click(`[data-nav-role="signin"]`);
 
       await page.waitForSelector('input[type="email"]');
-      await page.type('input[type="email"]', 'roma@redberry.ge');
+      await page.type(
+        'input[type="email"]',
+        this.configService.get('AMAZON_USERNAME'),
+      );
 
       await page.waitForSelector('#continue');
       await page.click('#continue');
@@ -61,7 +65,10 @@ export class AppService {
       await page.waitForNavigation({ waitUntil: 'networkidle0' });
 
       await page.waitForSelector('input[type="password"]');
-      await page.type('input[type="password"]', 'roma2021');
+      await page.type(
+        'input[type="password"]',
+        this.configService.get('AMAZON_PASSWORD'),
+      );
 
       await page.waitForSelector('#signInSubmit');
       await page.click('#signInSubmit');
